@@ -6,11 +6,12 @@
 </template>
 
 <script>
-// @ is an alias to /src
-import Navbar from "@/components/home/HomeNavbar.vue";
-
+import Navbar from "@/components/admin/AdminNavbar.vue";
 export default {
-  name: "HomeView",
-  components: { Navbar },
+  components: {
+    Navbar,
+  },
 };
 </script>
+
+<style></style>
