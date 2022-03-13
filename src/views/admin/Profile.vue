@@ -26,8 +26,8 @@
       <div class="card grey lighten-1">
         <div class="card-contend white-text">
           <span class="card-title black-text">Admine mesaj gönder</span>
-          <form>
-            <input class="input-field" />
+          <form @submit.prevent="sendMessage">
+            <input class="input-field" v-model="messageText" />
             <button class="btn black">Gönder</button>
           </form>
         </div>
@@ -38,11 +38,18 @@
         <div class="card-contend white-text">
           <span class="card-title black-text">Kişisel Bilgiler</span>
           <ul class="collection">
-            <li class="collection-item black-text">
+            <li
+              class="collection-item black-text"
+              v-for="mesaj in mesajlar"
+              :key="mesaj"
+            >
               <div>
-                Mesaj
+                {{ mesaj.content }}
                 <a href="#" class="secondary-content">
-                  <i class="fas fa-trash red-text"></i>
+                  <i
+                    class="fas fa-trash red-text"
+                    @click="mesajSil(mesaj.id)"
+                  ></i>
                 </a>
               </div>
             </li>
@@ -65,6 +72,9 @@ export default {
     const email = ref(null);
     const role = ref(null);
 
+    const messageText = ref("");
+    const mesajlar = ref([]);
+
     const { user } = getUser();
     const userUID = user.value.uid;
 
@@ -81,13 +91,56 @@ export default {
         email.value = data.email;
         role.value = data.role;
       });
+
+      await firestoreRef
+        .collection("mesajlar")
+        .where("kime", "==", userUID)
+        .where("aktiflik", "==", true)
+        .onSnapshot((snap) => {
+          mesajlar.value = [];
+          snap.docs.forEach((doc) => {
+            mesajlar.value.push({ ...doc.data(), id: doc.id });
+          });
+        });
     });
+
+    const sendMessage = async () => {
+      if (messageText.value != "") {
+        console.log(messageText.value);
+
+        const newMessage = {
+          content: messageText.value,
+          kimden: userUID,
+          kime: "admin",
+          tarih: date(),
+          aktiflik: true,
+        };
+
+        await firestoreRef
+          .collection("mesajlar")
+          .add(newMessage)
+          .then(() => {
+            messageText.value = "";
+          });
+      }
+    };
+
+    const deleteMesaj = async (id) => {
+      await firestoreRef
+        .collection("mesajlar")
+        .doc(id)
+        .update({ aktiflik: false });
+    };
 
     return {
       photoURL,
       displayName,
       email,
       role,
+      messageText,
+      sendMessage,
+      mesajlar,
+      deleteMesaj,
     };
   },
 };
