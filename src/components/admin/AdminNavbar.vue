@@ -17,9 +17,12 @@
           <a class="waves-effect waves-red btn-flat navbar-btn red darken-3">
             Yöentim
           </a>
-          <a class="waves-effect waves-red btn-flat navbar-btn red darken-3">
+          <router-link
+            :to="{ name: 'Messages' }"
+            class="waves-effect waves-red btn-flat navbar-btn red darken-3"
+          >
             Mesajlar
-          </a>
+          </router-link>
         </li>
       </span>
       <li>

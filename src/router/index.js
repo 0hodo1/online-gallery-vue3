@@ -22,7 +22,7 @@ const authControl = (to, form, next) => {
 
 const adminControl = async (to, form, next) => {
   let user = authRef.currentUser;
-  const { yetki } = getYetki(user.uid);
+  const { yetki } = await getYetki(user.uid);
   if (yetki.value != "admin") {
     next({ name: "Profile" });
   } else {
